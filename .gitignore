@@ -6,3 +6,8 @@ __pycache__/
 .idea/
 .claude/
 *.wav
+/CLAUDE.md
+/models/
+/voices/
+/hf_staging/
+/huggingface/
