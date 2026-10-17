@@ -99,10 +99,6 @@ pip install pytest     # oder: uv sync --extra cpu --group dev
 pytest
 ```
 
-## Bekannte Probleme
-Das aktuelle Modell erzeugt bei Audios>9 Sekunden ein "Klicken/Artefakt" nach ~9 Sekunden. 
-Wird in der nächsten Version behoben.
-
 ## Herkunft und Lizenz
 
 Apache 2.0 (`LICENSE`). Fremdcode und Herkunft: `NOTICE`.
