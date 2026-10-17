@@ -83,12 +83,13 @@ Code, Phonemizer, Modell und Stimmen müssen zusammenpassen. Deshalb ist jede Ve
 - **mideki** ist in `pyproject.toml` auf einen Git-Tag festgelegt. Beim Laden prüft die Pipeline, ob die
   Token-Tabelle von mideki zum Modell passt (`vocab_sha256` in `config.json`).
 - **Modell und Stimmen** werden von einem festen Tag des Hugging-Face-Repos geladen (`REVISION` in
-  `src/kikiri_de/hub.py`, aktuell `v1.0`). Ältere Versionen des Pakets laden weiterhin ihren eigenen Stand.
+  `src/kikiri_de/hub.py`, aktuell `v2.0`). Ältere Versionen des Pakets laden weiterhin ihren eigenen Stand.
 - **Stimmen** tragen in ihren Metadaten den Hash des Modell-Exports, aus dem sie extrahiert wurden
   (`source_model_sha256`). Passt er nicht zu `info.json` des Modells, bricht die Pipeline mit einer Fehlermeldung ab.
 
 | kikiri-de-inference | mideki | Hugging Face `junkstage/kikiri-de` |
 |---|---|---|
+| 0.2.0 | v1.0.0 | v2.0 |
 | 0.1.0 | v1.0.0 | v1.0 |
 
 ## Tests

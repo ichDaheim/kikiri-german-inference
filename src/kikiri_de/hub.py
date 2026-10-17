@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 REPO_ID = 'junkstage/kikiri-de'
 # HF tag of the model export and voices this code release belongs to. Never moved once published.
-REVISION = 'v1.0'
+REVISION = 'v2.0'
 VOICE_DIR = 'voices'
 
 
