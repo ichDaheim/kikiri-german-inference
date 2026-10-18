@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "kikiri-de-inference"
-version = "0.2.0"
+version = "0.3.0"
 description = "Inferenz für kikiri-de (deutsche Sprachsynthese, Kokoro/StyleTTS-2-Architektur)"
 readme = "README.md"
 license = { file = "LICENSE" }
