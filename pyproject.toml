@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "kikiri-de-inference"
-version = "0.3.0"
+version = "0.4.0"
 description = "Inferenz für kikiri-de (deutsche Sprachsynthese, Kokoro/StyleTTS-2-Architektur)"
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -26,7 +26,7 @@ dependencies = [
     "audioseal>=0.2,<0.3",  # watermark.py relies on 0.2 internals (no_compile, detector forward)
     # G2P with the model's token contract. Pinned to a tag: the token map must match the
     # model's vocab_sha256 (checked at runtime), and overrides change pronunciation.
-    "mideki @ git+https://github.com/ichDaheim/mideki.git@1.0.0",
+    "mideki @ git+https://github.com/ichDaheim/mideki.git@1.1.0",
 ]
 
 [project.optional-dependencies]

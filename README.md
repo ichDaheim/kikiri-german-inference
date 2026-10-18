@@ -113,7 +113,8 @@ Code, Phonemizer, Modell und Stimmen müssen zusammenpassen. Deshalb ist jede Ve
 
 | kikiri-de-inference | mideki | Hugging Face `junkstage/kikiri-de` |
 |---|---|---|
-| 0.3.0 | v1.0.0 | v2.0 |
+| 0.4.0 | 1.1.0 | v2.0 |
+| 0.3.0 | 1.0.0 | v2.0 |
 
 ## Tests
 

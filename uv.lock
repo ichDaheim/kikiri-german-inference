@@ -615,7 +615,7 @@ wheels = [
 
 [[package]]
 name = "kikiri-de-inference"
-version = "0.3.0"
+version = "0.4.0"
 source = { editable = "." }
 dependencies = [
     { name = "audioseal" },
@@ -651,7 +651,7 @@ dev = [
 requires-dist = [
     { name = "audioseal", specifier = ">=0.2,<0.3" },
     { name = "huggingface-hub", specifier = ">=0.24" },
-    { name = "mideki", git = "https://github.com/ichDaheim/mideki.git?rev=1.0.0" },
+    { name = "mideki", git = "https://github.com/ichDaheim/mideki.git?rev=1.1.0" },
     { name = "numpy", specifier = ">=1.26" },
     { name = "safetensors", specifier = ">=0.4" },
     { name = "soundfile", specifier = ">=0.12" },
@@ -772,8 +772,8 @@ wheels = [
 
 [[package]]
 name = "mideki"
-version = "1.0.0"
-source = { git = "https://github.com/ichDaheim/mideki.git?rev=1.0.0#b29b5bf27fc5284adb0fab10cb9190806633301f" }
+version = "1.1.0"
+source = { git = "https://github.com/ichDaheim/mideki.git?rev=1.1.0#ed6120bb25990e294b6119dfd215b04be2f44652" }
 dependencies = [
     { name = "espeakng-loader" },
     { name = "phonemizer-fork" },
