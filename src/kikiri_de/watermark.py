@@ -9,8 +9,10 @@ apart from other AudioSeal-marked audio.
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import math
+import warnings
 from dataclasses import dataclass
 from typing import Optional, Union
 
@@ -70,11 +72,57 @@ def _as_batch(audio: Union[np.ndarray, torch.Tensor], device: Union[str, torch.d
     return audio.reshape(1, 1, -1).to(device)
 
 
+@contextlib.contextmanager
+def _quiet_audioseal():
+    '''Silence the torch.jit.script deprecation raised by `@torch.jit.script` decorators in AudioSeal's own modules.'''
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', message=r'`torch\.jit\.script` is deprecated', category=FutureWarning)
+        yield
+
+
+def _no_compile():
+    # AudioSeal 0.2 wraps its convolutions in torch.compile, which needs a C++ compiler (cl.exe on Windows).
+    with _quiet_audioseal():
+        from audioseal.libs.moshi.utils.compile import no_compile
+    return no_compile()
+
+
+def _fold_weight_norm(state_dict: dict) -> dict:
+    '''Replace weight-norm pairs (g, v) by the plain weight g * v / ||v||, norm over all dims but 0.
+
+    Does what audioseal.loader.load_state_dict does, without its deprecated torch.nn.utils.weight_norm round trip.
+    '''
+    pairs = {'.weight_g': '.weight_v', '.parametrizations.weight.original0': '.parametrizations.weight.original1'}
+    folded = {}
+    for key, value in state_dict.items():
+        g_suffix = next((g for g in pairs if key.endswith(g)), None)
+        v_suffix = next((v for v in pairs.values() if key.endswith(v)), None)
+        if v_suffix:
+            continue
+        if g_suffix:
+            prefix = key[:-len(g_suffix)]
+            v = state_dict[prefix + pairs[g_suffix]]
+            folded[prefix + '.weight'] = v * (value / v.norm(dim=tuple(range(1, v.dim())), keepdim=True))
+        else:
+            folded[key] = value
+    return folded
+
+
 def _load(card: str, kind: str, device: torch.device) -> torch.nn.Module:
-    from audioseal import AudioSeal
+    with _quiet_audioseal():
+        from audioseal import AudioSeal
+        from audioseal.builder import AudioSealDetectorConfig, AudioSealWMConfig, create_detector, create_generator
+        from audioseal.loader import convert_state_dict_for_scriptable_model
 
     logger.info('loading watermark %s %s', kind, card)
-    model = AudioSeal.load_generator(card) if kind == 'generator' else AudioSeal.load_detector(card)
+    # AudioSeal.load_generator/load_detector, but with our own weight-norm folding (see _fold_weight_norm).
+    if kind == 'generator':
+        config_type, create = AudioSealWMConfig, create_generator
+    else:
+        config_type, create = AudioSealDetectorConfig, create_detector
+    checkpoint, config = AudioSeal.parse_model(card, config_type)
+    model = create(config)
+    model.load_state_dict(_fold_weight_norm(convert_state_dict_for_scriptable_model(checkpoint)))
     return model.to(device).eval()
 
 
@@ -91,14 +139,11 @@ class Watermarker:
         '''`audio` ([samples]) with the kikiri-de watermark added; same shape, dtype and device.'''
         if audio.numel() == 0:
             return audio
-        # AudioSeal 0.2 wraps its convolutions in torch.compile, which needs a C++ compiler (cl.exe on Windows).
-        from audioseal.libs.moshi.utils.compile import no_compile
-
         if self._generator is None:
             self._generator = _load(GENERATOR, 'generator', self.device)
         wave = _as_batch(audio, self.device)
         message = torch.tensor([MESSAGE], device=self.device)
-        with no_compile():
+        with _no_compile():
             mark = self._generator.get_watermark(resample(wave, sample_rate, WATERMARK_RATE), message=message)
         mark = resample(mark, WATERMARK_RATE, sample_rate)[..., :wave.shape[-1]]
         mark = F.pad(mark, (0, wave.shape[-1] - mark.shape[-1]))
@@ -107,13 +152,11 @@ class Watermarker:
     @torch.no_grad()
     def detect(self, audio: Union[np.ndarray, torch.Tensor], sample_rate: int = SAMPLE_RATE) -> Detection:
         '''Check a waveform ([samples] or [samples, channels]) for the watermark.'''
-        from audioseal.libs.moshi.utils.compile import no_compile
-
         if self._detector is None:
             self._detector = _load(DETECTOR, 'detector', self.device)
         wave = resample(_as_batch(audio, self.device), sample_rate, WATERMARK_RATE)
         # forward() instead of detect_watermark(): the latter is wrapped in @contextmanager in AudioSeal 0.2.0.
-        with no_compile():
+        with _no_compile():
             result, message = self._detector(wave)  # [1, 2, frames], [1, 16] bit probabilities
         probability = (result[:, 1, :] > DETECTION_THRESHOLD).float().mean().item()
         bits = tuple(int(b) for b in (message.reshape(-1) > 0.5).tolist())
