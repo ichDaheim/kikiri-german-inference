@@ -1,0 +1,43 @@
+kikiri-de
+Copyright 2026 semidark and kikiri-de contributors
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+kikiri-de is a German-only text-to-speech project. This repository contains
+its inference part only. It is written from scratch but reuses and adapts
+code from the following open-source projects:
+
+--------------------------------------------------------------------------------
+
+StyleTTS 2
+  Source:  https://github.com/yl4579/StyleTTS2
+  License: MIT License, Copyright (c) 2023 Aaron (Yinghao) Li
+  Used in: kikiri_de/modules/ (prosody predictor, text encoder, ISTFTNet decoder)
+
+PL-BERT
+  Source:  https://github.com/yl4579/PL-BERT
+  License: MIT License, Copyright (c) 2023 Aaron (Yinghao) Li
+  Used in: kikiri_de/modules/plbert.py (ALBERT phoneme encoder wrapper)
+
+Kokoro
+  Source:  https://github.com/hexgrad/kokoro
+  License: Apache License 2.0, Copyright hexgrad
+  Used in: kikiri_de/modules/ (inference-side module layout), kikiri_de/model.py
+
+kikiri-tts (predecessor project)
+  Source:  https://github.com/semidark/kikiri-tts
+  License: Apache License 2.0
+  Used in: training recipe experience, voicepack extraction approach
+
+--------------------------------------------------------------------------------
+
+mideki (dependency, not included in this repository)
+  Source:  https://github.com/ichDaheim/mideki
+  License: Apache License 2.0, derived from misaki (hexgrad, Apache 2.0) via
+           github.com/semidark/misaki. Provenance: NOTICE.md in that repository
+
+Model weights and voices (Hugging Face: ichDaheim/kikiri-de, not included here)
+  Trained by the kikiri project on the HUI-Audio-Corpus-German and Qwen-TTS
+  generated data; contain PL-BERT-de weights (fine-tuned during training).
+  The style encoders, which are only needed to create new voices, are not
+  included.

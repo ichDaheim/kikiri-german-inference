@@ -1,0 +1,14 @@
+.venv/
+.venv-*/
+__pycache__/
+*.pyc
+.pytest_cache/
+.idea/
+.claude/
+*.wav
+/CLAUDE.md
+/models/
+/voices/
+/hf_staging/
+/huggingface/
+/future_improvements.md

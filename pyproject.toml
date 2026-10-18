@@ -1,0 +1,70 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "kikiri-de-inference"
+version = "0.2.0"
+description = "Inferenz für kikiri-de (deutsche Sprachsynthese, Kokoro/StyleTTS-2-Architektur)"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10,<3.14"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: German",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+]
+dependencies = [
+    "numpy>=1.26",
+    "safetensors>=0.4",
+    "soundfile>=0.12",
+    "torch>=2.8",
+    "transformers>=4.40",
+    "huggingface_hub>=0.24",
+    # Inaudible watermark marking all output as AI-generated (EU AI Act, Art. 50(2)); see kikiri_de/watermark.py.
+    "audioseal>=0.2,<0.3",  # watermark.py relies on 0.2 internals (no_compile, detector forward)
+    # G2P with the model's token contract. Pinned to a tag: the token map must match the
+    # model's vocab_sha256 (checked at runtime), and overrides change pronunciation.
+    "mideki @ git+https://github.com/ichDaheim/mideki.git@1.0.0",
+]
+
+[project.optional-dependencies]
+# Only for uv: picks the torch wheel index. With pip, install torch from the index first (README).
+cpu = ["torch>=2.8"]
+cu128 = ["torch>=2.8"]
+
+[project.scripts]
+kikiri = "kikiri_de.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.uv]
+conflicts = [[{ extra = "cpu" }, { extra = "cu128" }]]
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cpu", extra = "cpu", marker = "sys_platform != 'darwin'" },
+    { index = "pytorch-cu128", extra = "cu128", marker = "sys_platform != 'darwin'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/kikiri_de"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
