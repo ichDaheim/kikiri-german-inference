@@ -79,7 +79,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument('text', nargs='?')
     p.add_argument('-i', '--input', help='Textdatei statt TEXT')
     p.add_argument('-m', '--model', help='lokaler Modellordner (Standard: passende Version von Hugging Face)')
-    p.add_argument('--voice', required=True, help='Stimmenname (z. B. Heinrich) oder .safetensors-Datei')
+    p.add_argument('--voice', required=True, help='Stimmenname (Heinrich, Anna) oder .safetensors-Datei')
     p.add_argument('-o', '--output', default='ausgabe.wav')
     p.add_argument('--speed', type=float, default=1.0)
     p.add_argument('--device')

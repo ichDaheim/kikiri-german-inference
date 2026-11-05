@@ -7,7 +7,7 @@ von null auf Deutsch trainiert.
 |---|---|
 | Inferenzcode (Modell, Pipeline, Tokenizer, Stimmen, CLI) | dieses Repository, `src/kikiri_de/` |
 | deutscher Phonemizer (G2P) mit dem Token-Vertrag des Modells | [mideki](https://github.com/ichDaheim/mideki), wird bei der Installation mitinstalliert |
-| Modellgewichte und Stimmen (`Heinrich`) | Hugging Face, [`junkstage/kikiri-de`](https://huggingface.co/junkstage/kikiri-de), werden beim ersten Aufruf geladen |
+| Modellgewichte und Stimmen (`Heinrich`, `Anna`) | Hugging Face, [`junkstage/kikiri-de`](https://huggingface.co/junkstage/kikiri-de), werden beim ersten Aufruf geladen |
 
 Es läuft unter Windows und Linux, auf der CPU oder mit einer NVIDIA-GPU (CUDA), mit Python 3.10 bis 3.13.
 
@@ -44,7 +44,7 @@ ist nicht nötig. Andere Versionen sprechen manche Wörter anders aus, als das M
 
 ```bash
 kikiri say "Die sakrale Kirche steht mitten im Dorf." --voice Heinrich -o ausgabe.wav
-kikiri say -i text.txt --voice Heinrich -o kapitel.wav --speed 1.1
+kikiri say -i text.txt --voice Anna -o kapitel.wav --speed 1.1
 kikiri phonemize "Zwölf Boxkämpfer"        # Phoneme und Token-IDs ansehen
 kikiri detect ausgabe.wav                  # KI-Wasserzeichen prüfen
 ```
@@ -71,7 +71,7 @@ Für reproduzierbare Ausgaben vorher `torch.manual_seed(...)` setzen.
 ## Stimmen mischen
 
 ```bash
-kikiri voice mix Heinrich andere_stimme.safetensors --weights 0.7,0.3 -o mix.safetensors
+kikiri voice mix Heinrich Anna --weights 0.7,0.3 -o mix.safetensors
 ```
 
 Eine Stimme ist ein einzelner Vektor (Klangfarbe und Prosodie). Gemischt wird als gewichteter Mittelwert.
@@ -106,13 +106,14 @@ Code, Phonemizer, Modell und Stimmen müssen zusammenpassen. Deshalb ist jede Ve
 - **mideki** ist in `pyproject.toml` auf einen Git-Tag festgelegt. Beim Laden prüft die Pipeline, ob die
   Token-Tabelle von mideki zum Modell passt (`vocab_sha256` in `config.json`).
 - **Modell und Stimmen** werden von einem festen Tag des Hugging-Face-Repos geladen (`REVISION` in
-  `src/kikiri_de/hub.py`, aktuell `v2.0`). Kommen später neue Tags dazu, lädt jede Paketversion weiterhin ihren
+  `src/kikiri_de/hub.py`, aktuell `v3.0`). Kommen später neue Tags dazu, lädt jede Paketversion weiterhin ihren
   eigenen Stand.
 - **Stimmen** tragen in ihren Metadaten den Hash des Modell-Exports, aus dem sie extrahiert wurden
   (`source_model_sha256`). Passt er nicht zu `info.json` des Modells, bricht die Pipeline mit einer Fehlermeldung ab.
 
 | kikiri-de-inference | mideki | Hugging Face `junkstage/kikiri-de` |
 |---|---|---|
+| 0.5.0 | 1.2.0 | v3.0 |
 | 0.4.0 | 1.1.0 | v2.0 |
 | 0.3.0 | 1.0.0 | v2.0 |
 
