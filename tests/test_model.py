@@ -151,7 +151,7 @@ def test_untrained_punctuation_is_replaced(text, expected):
 
 @pytest.mark.parametrize('text, expected', [
     ('Die JSON-Review kommt.', 'Die JSON Review kommt.'),  # both parts overridden
-    ('Das KI-Modell ist neu.', 'Das KI Modell ist neu.'),  # one part overridden
+    ('Das KI-Projekt ist neu.', 'Das KI Projekt ist neu.'),  # one part overridden
     ('Ein Fahrrad-Laden und zwei E-Mails.', 'Ein Fahrrad-Laden und zwei E-Mails.'),  # no part overridden
     ('Viele Start-ups scheitern.', 'Viele Start-ups scheitern.'),  # the whole word is overridden
     ('COVID-19 und Baden-Württemberg.', 'COVID-19 und Baden-Württemberg.'),
