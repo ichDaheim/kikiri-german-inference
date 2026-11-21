@@ -20,8 +20,29 @@ from .watermark import Watermarker
 
 logger = logging.getLogger(__name__)
 
-_SENTENCE_END = re.compile(r'(?<=[.!?…])\s+|\n+')
+# A period after these is not a sentence end: ordinals and dates ("1. Januar", "am 3. Mai") and the
+# abbreviations mideki expands ("Dr. Müller", "z. B."). Splitting there would hand mideki "1." on its own,
+# which it reads as "eins." followed by a pause.
+_NO_SENTENCE_END = re.compile(
+    r'(?:\b\d{1,3}|\b(?:Dr|Prof|Hr|Fr|Nr|Str|Tel|Abt|Abs|gem|ca|vgl|inkl|exkl|bzw|ggf'
+    r'|Jan|Feb|Mär|Apr|Jun|Jul|Aug|Sep|Okt|Nov|Dez|[A-Za-zÄÖÜäöü]))\.$'
+)
 _CLAUSE_END = re.compile(r'(?<=[,;:—])\s+')
+
+
+def split_sentences(text: str) -> List[str]:
+    '''Split text at sentence ends and line breaks, but not after ordinals and abbreviations.'''
+    sentences: List[str] = []
+    for line in re.split(r'\n+', text):
+        current = ''
+        for piece in re.split(r'(?<=[.!?…])\s+', line.strip()):
+            current = current + ' ' + piece if current else piece
+            if not _NO_SENTENCE_END.search(current):
+                sentences.append(current)
+                current = ''
+        if current:
+            sentences.append(current)
+    return [s for s in sentences if s]
 
 
 @dataclass
@@ -71,9 +92,8 @@ class Pipeline:
     def chunks(self, text: str) -> List[str]:
         '''Split text into pieces that each fit into `max_tokens` after G2P.'''
         pieces: List[str] = []
-        for sentence in (s.strip() for s in _SENTENCE_END.split(text)):
-            if sentence:
-                pieces.extend(self._fit(sentence))
+        for sentence in split_sentences(text):
+            pieces.extend(self._fit(sentence))
         merged: List[str] = []
         for piece in pieces:
             if merged and self._n_tokens(merged[-1] + ' ' + piece) <= self.max_tokens and len(merged[-1]) < 150:
