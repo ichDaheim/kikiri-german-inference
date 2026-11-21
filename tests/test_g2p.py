@@ -33,6 +33,10 @@ def test_output_is_canonical(g2p):
     assert unknown_symbols(ps.replace(' ', '')) == []
 
 
+def test_ordinals_are_inflected(g2p):
+    assert g2p('Vom 1. bis zum 3. Mai.') == 'fˈɔm ˈeːɾstən bˈɪs ʦˈʊm dɾˈɪtən mˈI.'  # mideki >= 1.6.0
+
+
 def test_overrides_are_applied(g2p):
     assert g2p('PyTorch') == 'pˈItɔːɾʧ'  # ɹ replaced by ɾ (ɹ: 45 times in the training data)
 
